@@ -1,5 +1,6 @@
 from flask import Flask, url_for, request
 from flask_sqlalchemy import SQLAlchemy
+import datetime
 import json
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ class TH(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temperature = db.Column(db.Float, unique=False)
     humidity = db.Column(db.Float, unique=False)
+    created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=True)
     
     def __init__(self, temperature, humidity):
         self.temperature = temperature
@@ -27,7 +29,7 @@ def index():
 def queryTHRecords():
     temp = []
     for th in TH.query.all():
-        temp.append({'temperature': th.temperature, 'humidity': th.humidity})
+        temp.append({'temperature': th.temperature, 'humidity': th.humidity, 'created_date': str(th.created_date)})
     return json.dumps(temp)
 
 @app.route('/lot/th/add/<float:t>/<float:h>')

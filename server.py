@@ -27,12 +27,13 @@ def index():
 
 @app.route('/lot/th/')
 def queryTHRecords():
-    temp = []
-    for th in TH.query.all():
+    temp = []    
+    records = db.session.query(TH).order_by(TH.created_date.desc()).limit(20)
+    for th in records:
         temp.append({'temperature': th.temperature, 'humidity': th.humidity, 'created_date': str(th.created_date)})
     return  makeResponse(json.dumps(temp))
 
-@app.route('/lot/th/add/<float:t>/<float:h>')
+@app.route('/lot/th/add/<t>/<h>')
 def addNewTHRecord(t, h):
     record = TH(t, h)
     db.session.add(record)

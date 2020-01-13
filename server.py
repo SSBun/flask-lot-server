@@ -1,4 +1,4 @@
-from flask import Flask, url_for, request
+from flask import Flask, url_for, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 import json
@@ -23,22 +23,28 @@ class TH(db.Model):
 
 @app.route('/')
 def index():
-    return "Hello Worlddadccd!"
+    return makeResponse('Hello World!')
 
 @app.route('/lot/th/')
 def queryTHRecords():
     temp = []
     for th in TH.query.all():
         temp.append({'temperature': th.temperature, 'humidity': th.humidity, 'created_date': str(th.created_date)})
-    return json.dumps(temp)
+    return  makeResponse(json.dumps(temp))
 
 @app.route('/lot/th/add/<float:t>/<float:h>')
 def addNewTHRecord(t, h):
     record = TH(t, h)
     db.session.add(record)
     db.session.commit()
-    return 'add record success'
+    return makeResponse('success')
 
+def makeResponse(content: str):
+    res = make_response(content)
+    res.headers['Access-Control-Allow-Origin'] = '*'
+    res.headers['Access-Control-Allow-Methods'] = 'GET'
+    res.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
+    return res
 
 if __name__ == '__main__':
     app.run()
